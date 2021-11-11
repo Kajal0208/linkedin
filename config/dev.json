@@ -1,7 +1,7 @@
 {
     "linkedin":{
-        "client_id":"78j7jxclhu5bzs",
-        "client_secret":"3ZeKKuOkFPuKzdJD",
+        "client_id":"783z3xy03lqqqk",
+        "client_secret":"wSrxri6YElZWdb6n",
         "authorizationURL":"https://www.linkedin.com/oauth/v2/authorization",
         "accessTokenURL":"https://www.linkedin.com/oauth/v2/accessToken",
         "redirectURL": "http://localhost:3000/callback"

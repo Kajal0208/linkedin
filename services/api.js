@@ -1,5 +1,8 @@
 const request = require('request');
 const config = require('../config/dev.json');
+const conn = require('../config/conn');
+
+
 
 class API {
     static getAuthorizationUrl() {
@@ -12,8 +15,8 @@ class API {
 
     static getAccessToken(req) {
         const { code } = req.query;
-       
-       
+       console.log("code-",code);
+      
         const body = {
             grant_type: 'authorization_code',
             code,
@@ -21,15 +24,15 @@ class API {
             client_id: config.linkedin.client_id,
             client_secret: config.linkedin.client_secret
         };
-    
+       
         return new Promise((resolve, reject) => {
             request.post({url: config.linkedin.accessTokenURL, form: body }, (err, response, body) =>
         { 
-           
+            ;
             if(err) {
                 reject(err);
             }
-           
+          
             resolve(JSON.parse(body));
         }
         );
@@ -66,14 +69,14 @@ class API {
 
     static publishContent(req, linkedinId, content) {
         const url = 'https://api.linkedin.com/v2/ugcPosts';
-        // const { title, text, shareUrl, shareThumbnailUrl } = content;
+       
         const body =  {
-            "author": "urn:li:person:M39Kt_9aNn",
+            "author": "urn:li:person:EvDrEvJdS1",
             "lifecycleState": "PUBLISHED",
             "specificContent": {
                 "com.linkedin.ugc.ShareContent": {
                     "shareCommentary": {
-                        "text": "Hello World! This is my first Share on LinkedIn!"
+                        "text": "Hello World! This is my first Share on Linkedin"
                     },
                     "shareMediaCategory": "NONE"
                 }
@@ -89,7 +92,15 @@ class API {
             'X-Restli-Protocol-Version': '2.0.0',
             'x-li-format': 'json'
         };
-      
+        const addData = async({conn,linkedinId,body,post_id})=>{
+            const params = [];
+            params.push(linkedinId,post_id,body);
+            
+            const query =  'Insert into Linkedin_posts (person_id,post_id,access_token) VALUES(?,?,?)'
+            const { rows } = await conn.query(query, params);
+            return rows;
+        }
+       
         return new Promise((resolve, reject) => {
             
             request.post({ url: url, json: body, headers: headers}, (err, response, body) => {
@@ -97,8 +108,10 @@ class API {
                     console.log(err);
                     reject(err);
                 }
-                
+               
+               
                 resolve(body);
+                addData({conn,linkedinId:"EvDrEvJdS1",body:req.headers.authorization,post_id:body.id});
             });
         });
     }
